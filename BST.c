@@ -29,6 +29,56 @@ struct Node* createNode(int key) {
     return newNode;
 }
 
+struct Node* minValueNode(struct Node* node) {
+    struct Node* current = node;
+
+    /* loop down to find the leftmost leaf */
+    while (current && current->left != NULL)
+        current = current->left;
+
+    return current;
+}
+
+struct Node* deleteNode(struct Node* root, int key) {
+    // Base case: If the tree is empty
+    if (root == NULL) {
+        return root;
+    }
+
+    // If the key to be deleted is smaller than the root's key, then it lies in the left subtree
+    if (key < root->key) {
+        root->left = deleteNode(root->left, key);
+    }
+    // If the key to be deleted is greater than the root's key, then it lies in the right subtree
+    else if (key > root->key) {
+        root->right = deleteNode(root->right, key);
+    }
+    // If key is same as root's key, then this is the node to be deleted
+    else {
+        // Node with only one child or no child
+        if (root->left == NULL) {
+            struct Node* temp = root->right;
+            free(root);
+            return temp;
+        }
+        else if (root->right == NULL) {
+            struct Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        // Node with two children: Get the inorder successor (smallest in the right subtree)
+        struct Node* temp = minValueNode(root->right);
+
+        // Copy the inorder successor's content to this node
+        root->key = temp->key;
+
+        // Delete the inorder successor
+        root->right = deleteNode(root->right, temp->key);
+    }
+    return root;
+}
+
 
 /*
 The  CONSTRUCT  command  expects  a  set  of  integers  in  brackets  separated  by  commas.  The 
@@ -122,6 +172,8 @@ int parent(struct Node* root, int key){
     }
 
 }
+
+
 
 /*
 The  DELETE  command  expects  one  integer  value.  Its  purpose  is  to  find  the  given  value  in  the 
