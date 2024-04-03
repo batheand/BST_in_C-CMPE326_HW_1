@@ -10,6 +10,8 @@ Gökay Toğa
 #include <stdio.h>
 #include <stdlib.h>
 
+int insert(struct Node* root, int key);
+
 struct Node {
     int key;
     struct Node *left;
