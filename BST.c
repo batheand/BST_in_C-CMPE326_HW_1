@@ -15,7 +15,7 @@ struct Node {
     struct Node *left;
     struct Node *right;
     struct Node *parent;
-}
+};
 
 // Function to create a new node
 struct Node* createNode(int key) {
@@ -26,6 +26,7 @@ struct Node* createNode(int key) {
     newNode->parent = NULL;
     return newNode;
 }
+
 
 /*
 The  CONSTRUCT  command  expects  a  set  of  integers  in  brackets  separated  by  commas.  The 
@@ -161,7 +162,7 @@ int delete(struct Node* root, int key){
     }
     return root;
 }
-}
+
 
 int main() {
     
