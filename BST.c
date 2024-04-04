@@ -44,6 +44,7 @@ Root changed. The new root is 3
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 struct Node {
@@ -53,9 +54,10 @@ struct Node {
     struct Node *parent;
 };
 
-struct Node* insert(struct Node* root, int key);
+static struct Node* root = NULL;
+
+struct Node* insert(int key);
 void freeTree(struct Node* root) ;
-void inorder(struct Node* root);
 
 // Function to create a new node
 struct Node* createNode(int key) {
@@ -77,47 +79,6 @@ struct Node* minValueNode(struct Node* node) {
     return current;
 }
 
-struct Node* deleteNode(struct Node* root, int key) {
-    // Base case: If the tree is empty
-    if (root == NULL) {
-        return root;
-    }
-
-    // If the key to be deleted is smaller than the root's key, then it lies in the left subtree
-    if (key < root->key) {
-        root->left = deleteNode(root->left, key);
-    }
-    // If the key to be deleted is greater than the root's key, then it lies in the right subtree
-    else if (key > root->key) {
-        root->right = deleteNode(root->right, key);
-    }
-    // If key is same as root's key, then this is the node to be deleted
-    else {
-        // Node with only one child or no child
-        if (root->left == NULL) {
-            struct Node* temp = root->right;
-            free(root);
-            return temp;
-        }
-        else if (root->right == NULL) {
-            struct Node* temp = root->left;
-            free(root);
-            return temp;
-        }
-
-        // Node with two children: Get the inorder successor (smallest in the right subtree)
-        struct Node* temp = minValueNode(root->right);
-
-        // Copy the inorder successor's content to this node
-        root->key = temp->key;
-
-        // Delete the inorder successor
-        root->right = deleteNode(root->right, temp->key);
-    }
-    return root;
-}
-
-
 /*
 The  CONSTRUCT  command  expects  a  set  of  integers  in  brackets  separated  by  commas.  The 
 command takes the input and constructs a binary tree rooted at the first element of the input.   
@@ -128,7 +89,7 @@ struct Node* construct(int keys[]){
     int size = sizeof(keys) / sizeof(keys[0]);
     struct Node* root = NULL;
     for (int i = 0; i < size; i++) {
-        root = insert(root, keys[i]);
+        root = insert(keys[i]);
     }
     return root;
 }
@@ -140,26 +101,40 @@ correct position in the tree. For example, INSERT 55, places the value 55 in the
 shown in Figure 2 and outputs:  
 The parent of 55 is 65
 */
-struct Node* insert(struct Node* root, int key){
-
+struct Node* insert(int key) {
+    // If the tree is empty, create a new node
     if (root == NULL) {
-        return createNode(key);
+        root = createNode(key);
+        return root;
     }
 
-    // Otherwise, recur down the tree
-    if (key <= root->key) { // Allow duplicates by using <= instead of <
-        struct Node* leftChild = insert(root->left, key);
-        root->left = leftChild;
-        leftChild->parent = root; // Update parent pointer
+    struct Node *current = root;
+    struct Node *parent = NULL;
+
+    // Find the appropriate position to insert the new node
+    while (current != NULL) {
+        parent = current;
+        if (key <= current->key) { 
+            current = current->left;
+        } else {
+            current = current->right;
+        }
+    }
+
+    // Create the new node
+    struct Node *newNode = createNode(key);
+
+    // Insert the new node at the appropriate position
+    if (key <= parent->key) {
+        parent->left = newNode;
+        newNode->parent = parent;
     } else {
-        struct Node* rightChild = insert(root->right, key);
-        root->right = rightChild;
-        rightChild->parent = root; // Update parent pointer
+        parent->right = newNode;
+        newNode->parent = parent;
     }
 
-    // Return the unchanged node pointer
-    return root;
 }
+
 
 /*
 The  LIST  command  performs  inorder traversal  on  the  tree (see  Figure  3) and  prints  the  keys  of 
@@ -168,7 +143,7 @@ order.  For  example,  LIST  command  that  is  given  after  previous  two  exa
 output will be: 
 3 3 5 10 12 31 55 65 100
 */
-void list(struct Node* root){
+void list(){
 
     if (root != NULL) {
         list(root->left);
@@ -189,7 +164,7 @@ Note:  You can assume that there are no errors in the input. Hence, you do not n
 check for correctness of the provided input. 
              Here are some sample runs
 */
-void parent(struct Node* root, int key){
+void parent(int key){
 
     struct Node* current = root;
     struct Node* parent = NULL;
@@ -210,8 +185,8 @@ void parent(struct Node* root, int key){
     }
 
 }
-
-struct Node* findParent(struct Node* root, int key) {
+//Method to find the parent of the given key
+struct Node* findParent(int key) {
     struct Node* current = root;
     struct Node* parent = NULL;
 
@@ -227,8 +202,6 @@ struct Node* findParent(struct Node* root, int key) {
     return parent;
 }
 
-
-
 /*
 The  DELETE  command  expects  one  integer  value.  Its  purpose  is  to  find  the  given  value  in  the 
 tree  and  delete  it. The state  of the tree  after deletion should still obey  the  rules specified  above. 
@@ -236,105 +209,111 @@ Also  observe  that  the  root of  the  tree  might  change after  delete  opera
 the  order  of  the  tree  and  reconnect  the  parent/child  connections.  Figure  4  shows  three  different 
 scenarios of delete operation: a node has no children, has single child and has two children.
 */
-struct Node* delete(struct Node* root, int key){
+
+struct Node* delete(int key) {
     // Base case: If the tree is empty
     if (root == NULL) {
         return root;
     }
 
-    // Recur down the tree
-    if (key < root->key) {
-        root->left = deleteNode(root->left, key);
-    } else if (key > root->key) {
-        root->right = deleteNode(root->right, key);
-    } else {
-        // Node with only one child or no child
-        if (root->left == NULL) {
-            struct Node* temp = root->right;
-            free(root);
-            return temp;
-        } else if (root->right == NULL) {
-            struct Node* temp = root->left;
-            free(root);
-            return temp;
+    struct Node *current = root;
+    struct Node *parent = NULL;
+
+    // Find the node to delete and its parent
+    while (current != NULL && current->key != key) {
+        parent = current;
+        if (key < current->key) {
+            current = current->left;
+        } else {
+            current = current->right;
         }
-
-        // Node with two children: Get the inorder successor (smallest in the right subtree)
-        struct Node* temp = minValueNode(root->right);
-
-        // Copy the inorder successor's content to this node
-        root->key = temp->key;
-
-        // Delete the inorder successor
-        root->right = deleteNode(root->right, temp->key);
     }
-    return root;
+
+    // If the key is not found, return NULL
+    if (current == NULL) {
+        return NULL;
+    }
+
+    // Node with only one child or no child
+    if (current->left == NULL) {
+        if (parent == NULL) {
+            root = current->right;
+        } else if (current == parent->left) {
+            parent->left = current->right;
+        } else {
+            parent->right = current->right;
+        }
+        free(current);
+    } else if (current->right == NULL) {
+        if (parent == NULL) {
+            root = current->left;
+        } else if (current == parent->left) {
+            parent->left = current->left;
+        } else {
+            parent->right = current->left;
+        }
+        free(current);
+    }
+
+    // Node with two children: Get the inorder successor 
+    struct Node* successor = minValueNode(current->right);
+
+    // Copy the inorder successor's content to this node
+    current->key = successor->key;
+
+    // Delete the inorder successor
+    current->right = delete(successor->key);
+
 }
 
 
 int main() {
     
-    struct Node* root = NULL;
+    //struct Node* root = NULL;
     char line[100];
     char command[20];
     int key;
 
-    while (fgets(line, sizeof(line), stdin) != NULL) {
+    while (fgets(line, sizeof(line), stdin) != NULL) {//while loop for reading inputs
         sscanf(line, "%s", command);
-        #include <string.h>
-        if (strcmp(command, "CONSTRUCT") == 0) {
+        if (strcmp(command, "CONSTRUCT") == 0) {// checks the commands for CONSTRUCT
             int keys[20];
             int size = 0;
             char *token = strtok(line, "[,]");
-            while (token != NULL) {
+            while (token != NULL) {// While loop for takin the inputs
                 if (sscanf(token, "%d", &key) == 1) {
                     keys[size++] = key;
                 }
                 token = strtok(NULL, "[,]");
             }
-            for (int i = 0; i < size; i++) {
-                root = insert(root, keys[i]);
-            }
-        } else if (strcmp(command, "INSERT") == 0) {
+            construct(keys);
+        } else if (strcmp(command, "INSERT") == 0) {// checks the commands for INSERT
             sscanf(line, "INSERT %d", &key);
-            root = insert(root, key);
-            struct Node* parent = findParent(root, key);
-            if (parent != NULL) {
+            insert(key);// inserts root
+            struct Node* parent = findParent(key);
+            if (parent != NULL) {// if no parent it sets parent
                 printf("The parent of %d is %d\n", key, parent->key);
             }
-        } else if (strcmp(command, "LIST") == 0) {
-            //printf("Inorder traversal of the BST: ");
-            inorder(root);
+        } else if (strcmp(command, "LIST") == 0) {// checks the commands for LIST
+            list();//prints inorder traversal
             printf("\n");
-        } else if (strcmp(command, "DELETE") == 0) {
+        } else if (strcmp(command, "DELETE") == 0) {// checks the commands for DELETE
             int temp = root->key;
             sscanf(line, "DELETE %d", &key);
-            root = deleteNode(root, key);
+            delete(key);//deletes the wanted node
             if (root != NULL && root->key != temp) {
                 printf("Root changed. The new root is %d\n", root->key);
             }
-        } else if (strcmp(command, "PARENT") == 0) {
+        } else if (strcmp(command, "PARENT") == 0) {// checks the commands for PARENT
             sscanf(line, "PARENT %d", &key);
-            struct Node* parent = findParent(root, key);
-            if (parent == NULL) {
-                printf("It is a root node\n");
-            } else {
-                printf("The parent of %d is %d\n", key, parent->key);
-            }
+            parent(key);
         }
     }
 
-    freeTree(root);
+    freeTree(root);//frees the space used by the tree
     return 0;    
 }
-void inorder(struct Node* root) {
-    if (root != NULL) {
-        inorder(root->left);
-        printf("%d ", root->key);
-        inorder(root->right);
-    }
-}
-void freeTree(struct Node* root) {
+void freeTree(struct Node* root) {//free method
     if (root != NULL) {
         freeTree(root->left);
         freeTree(root->right);
