@@ -54,7 +54,7 @@ struct Node {
     struct Node *parent;
 };
 
-static struct Node* root = NULL;
+struct Node *root = NULL;
 
 struct Node* insert(int key);
 void freeTree(struct Node* root) ;
@@ -144,7 +144,6 @@ output will be:
 3 3 5 10 12 31 55 65 100
 */
 void list(){
-
     if (root != NULL) {
         list(root->left);
         printf("%d ", root->key);
