@@ -1,0 +1,18 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     "/Users/batuhan/Documents/tedü/3rd year/6th semester/CMPE 326/HWS/1/github/output/BST"
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _createNode, symObjAddr: 0x0, symBinAddr: 0x100003270, symSize: 0x50 }
+  - { offsetInCU: 0x86, offset: 0x86, size: 0x8, addend: 0x0, symName: _createNode, symObjAddr: 0x0, symBinAddr: 0x100003270, symSize: 0x50 }
+  - { offsetInCU: 0xBC, offset: 0xBC, size: 0x8, addend: 0x0, symName: _minValueNode, symObjAddr: 0x50, symBinAddr: 0x1000032C0, symSize: 0x70 }
+  - { offsetInCU: 0xF2, offset: 0xF2, size: 0x8, addend: 0x0, symName: _deleteNode, symObjAddr: 0xC0, symBinAddr: 0x100003330, symSize: 0x178 }
+  - { offsetInCU: 0x17C, offset: 0x17C, size: 0x8, addend: 0x0, symName: _construct, symObjAddr: 0x238, symBinAddr: 0x1000034A8, symSize: 0x78 }
+  - { offsetInCU: 0x1DC, offset: 0x1DC, size: 0x8, addend: 0x0, symName: _insert, symObjAddr: 0x2B0, symBinAddr: 0x100003520, symSize: 0xD0 }
+  - { offsetInCU: 0x24A, offset: 0x24A, size: 0x8, addend: 0x0, symName: _list, symObjAddr: 0x380, symBinAddr: 0x1000035F0, symSize: 0x70 }
+  - { offsetInCU: 0x272, offset: 0x272, size: 0x8, addend: 0x0, symName: _parent, symObjAddr: 0x3F0, symBinAddr: 0x100003660, symSize: 0x114 }
+  - { offsetInCU: 0x2C4, offset: 0x2C4, size: 0x8, addend: 0x0, symName: _findParent, symObjAddr: 0x504, symBinAddr: 0x100003774, symSize: 0xB4 }
+  - { offsetInCU: 0x316, offset: 0x316, size: 0x8, addend: 0x0, symName: _delete, symObjAddr: 0x5B8, symBinAddr: 0x100003828, symSize: 0x178 }
+  - { offsetInCU: 0x3A2, offset: 0x3A2, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x730, symBinAddr: 0x1000039A0, symSize: 0x41C }
+  - { offsetInCU: 0x4AF, offset: 0x4AF, size: 0x8, addend: 0x0, symName: _inorder, symObjAddr: 0xB4C, symBinAddr: 0x100003DBC, symSize: 0x6C }
+  - { offsetInCU: 0x4D5, offset: 0x4D5, size: 0x8, addend: 0x0, symName: _freeTree, symObjAddr: 0xBB8, symBinAddr: 0x100003E28, symSize: 0x54 }
+...
