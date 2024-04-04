@@ -168,7 +168,7 @@ order.  For  example,  LIST  command  that  is  given  after  previous  two  exa
 output will be: 
 3 3 5 10 12 31 55 65 100
 */
-int* list(struct Node* root){
+void list(struct Node* root){
 
     if (root != NULL) {
         list(root->left);
@@ -189,7 +189,7 @@ Note:  You can assume that there are no errors in the input. Hence, you do not n
 check for correctness of the provided input. 
              Here are some sample runs
 */
-int parent(struct Node* root, int key){
+void parent(struct Node* root, int key){
 
     struct Node* current = root;
     struct Node* parent = NULL;
