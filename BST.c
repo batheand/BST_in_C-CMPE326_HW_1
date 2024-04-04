@@ -133,6 +133,7 @@ struct Node* insert(int key) {
         newNode->parent = parent;
     }
 
+    return root;
 }
 
 
@@ -230,7 +231,7 @@ struct Node* delete(int key) {
 
     // If the key is not found, return NULL
     if (current == NULL) {
-        return NULL;
+        return root ;
     }
 
     // Node with only one child or no child
@@ -263,6 +264,7 @@ struct Node* delete(int key) {
     // Delete the inorder successor
     current->right = delete(successor->key);
 
+    return root;
 }
 
 
@@ -288,7 +290,7 @@ int main() {
             construct(keys);
         } else if (strcmp(command, "INSERT") == 0) {// checks the commands for INSERT
             sscanf(line, "INSERT %d", &key);
-            insert(key);// inserts root
+            root = insert(key);// inserts root
             struct Node* parent = findParent(key);
             if (parent != NULL) {// if no parent it sets parent
                 printf("The parent of %d is %d\n", key, parent->key);
@@ -299,7 +301,7 @@ int main() {
         } else if (strcmp(command, "DELETE") == 0) {// checks the commands for DELETE
             int temp = root->key;
             sscanf(line, "DELETE %d", &key);
-            delete(key);//deletes the wanted node
+            root = delete(key);//deletes the wanted node
             if (root != NULL && root->key != temp) {
                 printf("Root changed. The new root is %d\n", root->key);
             }
