@@ -55,6 +55,7 @@ struct Node {
 };
 
 struct Node *root = NULL;
+int size = 0;
 
 struct Node* insert(int key);
 void freeTree(struct Node* root) ;
@@ -86,8 +87,7 @@ For example, for the input given below, your program should construct a tree as 
  CONSTRUCT [31, 65, 3, 10, 5, 100, 3, 12]
 */
 struct Node* construct(int keys[]){
-    int size = sizeof(keys) / sizeof(keys[0]);
-    struct Node* root = NULL;
+    //int size = sizeof(keys) / sizeof(keys[0]);
     for (int i = 0; i < size; i++) {
         root = insert(keys[i]);
     }
@@ -102,38 +102,38 @@ shown in Figure 2 and outputs:
 The parent of 55 is 65
 */
 struct Node* insert(int key) {
-    // If the tree is empty, create a new node
     if (root == NULL) {
+        // If the tree is empty, create a new node as the root
         root = createNode(key);
         return root;
     }
 
-    struct Node *current = root;
-    struct Node *parent = NULL;
+    struct Node *current = root;  // Start from the root
 
-    // Find the appropriate position to insert the new node
-    while (current != NULL) {
-        parent = current;
-        if (key <= current->key) { 
-            current = current->left;
+    // Recursively traverse the tree to find the appropriate insertion point
+    while (1) {
+        if (key <= current->key) {
+            if (current->left == NULL) {
+                // Insert as the left child
+                current->left = createNode(key);
+                current->left->parent = current;  // Update parent pointer
+                break;
+            } else {
+                current = current->left;
+            }
         } else {
-            current = current->right;
+            if (current->right == NULL) {
+                // Insert as the right child
+                current->right = createNode(key);
+                current->right->parent = current;  // Update parent pointer
+                break;
+            } else {
+                current = current->right;
+            }
         }
     }
 
-    // Create the new node
-    struct Node *newNode = createNode(key);
-
-    // Insert the new node at the appropriate position
-    if (key <= parent->key) {
-        parent->left = newNode;
-        newNode->parent = parent;
-    } else {
-        parent->right = newNode;
-        newNode->parent = parent;
-    }
-
-    return root;
+    return root;  // Return the updated root
 }
 
 
@@ -144,7 +144,7 @@ order.  For  example,  LIST  command  that  is  given  after  previous  two  exa
 output will be: 
 3 3 5 10 12 31 55 65 100
 */
-void list(){
+void list(struct Node* root){
     if (root != NULL) {
         list(root->left);
         printf("%d ", root->key);
@@ -211,7 +211,6 @@ scenarios of delete operation: a node has no children, has single child and has 
 */
 
 struct Node* delete(int key) {
-    // Base case: If the tree is empty
     if (root == NULL) {
         return root;
     }
@@ -219,7 +218,6 @@ struct Node* delete(int key) {
     struct Node *current = root;
     struct Node *parent = NULL;
 
-    // Find the node to delete and its parent
     while (current != NULL && current->key != key) {
         parent = current;
         if (key < current->key) {
@@ -229,12 +227,10 @@ struct Node* delete(int key) {
         }
     }
 
-    // If the key is not found, return NULL
     if (current == NULL) {
-        return root ;
+        return root;
     }
 
-    // Node with only one child or no child
     if (current->left == NULL) {
         if (parent == NULL) {
             root = current->right;
@@ -253,19 +249,15 @@ struct Node* delete(int key) {
             parent->right = current->left;
         }
         free(current);
+    } else {
+        struct Node* temp = minValueNode(current->right);
+        current->key = temp->key;
+        current->right = delete(temp->key); // Recursively delete the inorder successor
     }
-
-    // Node with two children: Get the inorder successor 
-    struct Node* successor = minValueNode(current->right);
-
-    // Copy the inorder successor's content to this node
-    current->key = successor->key;
-
-    // Delete the inorder successor
-    current->right = delete(successor->key);
 
     return root;
 }
+
 
 
 int main() {
@@ -279,15 +271,15 @@ int main() {
         sscanf(line, "%s", command);
         if (strcmp(command, "CONSTRUCT") == 0) {// checks the commands for CONSTRUCT
             int keys[20];
-            int size = 0;
+            //int size = 0;
             char *token = strtok(line, "[,]");
             while (token != NULL) {// While loop for takin the inputs
                 if (sscanf(token, "%d", &key) == 1) {
                     keys[size++] = key;
                 }
                 token = strtok(NULL, "[,]");
-            }
-            construct(keys);
+            }       
+            root = construct(keys);
         } else if (strcmp(command, "INSERT") == 0) {// checks the commands for INSERT
             sscanf(line, "INSERT %d", &key);
             root = insert(key);// inserts root
@@ -296,7 +288,7 @@ int main() {
                 printf("The parent of %d is %d\n", key, parent->key);
             }
         } else if (strcmp(command, "LIST") == 0) {// checks the commands for LIST
-            list();//prints inorder traversal
+            list(root);//prints inorder traversal
             printf("\n");
         } else if (strcmp(command, "DELETE") == 0) {// checks the commands for DELETE
             int temp = root->key;
