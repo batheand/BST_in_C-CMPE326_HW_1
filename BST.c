@@ -210,49 +210,51 @@ the  order  of  the  tree  and  reconnect  the  parent/child  connections.  Figu
 scenarios of delete operation: a node has no children, has single child and has two children.
 */
 
-struct Node* delete(int key) {
+struct Node* delete(struct Node* root, int key) {
+    // If the tree is empty, return NULL
     if (root == NULL) {
         return root;
     }
 
-    struct Node *current = root;
-    struct Node *parent = NULL;
+    struct Node *current = root;//starting from root
+    struct Node *parent = NULL;// parent pointer
 
-    while (current != NULL && current->key != key) {
+    while (current != NULL && current->key != key) {// while loop to find the node to delete
         parent = current;
         if (key < current->key) {
-            current = current->left;
+            current = current->left;// to left child
         } else {
-            current = current->right;
+            current = current->right;// to right child
         }
     }
 
-    if (current == NULL) {
+    if (current == NULL) {// return root if not found
         return root;
     }
 
-    if (current->left == NULL) {
+    if (current->left == NULL) {// no left child 
         if (parent == NULL) {
-            root = current->right;
+            root = current->right;// update if the root is deleted
         } else if (current == parent->left) {
-            parent->left = current->right;
+            parent->left = current->right;// update parents left
         } else {
-            parent->right = current->right;
+            parent->right = current->right;// update parent right
         }
         free(current);
-    } else if (current->right == NULL) {
+    } else if (current->right == NULL) {// no right child
         if (parent == NULL) {
-            root = current->left;
+            root = current->left;// update if the root is deleted
         } else if (current == parent->left) {
-            parent->left = current->left;
+            parent->left = current->left;// update parents left
         } else {
-            parent->right = current->left;
+            parent->right = current->left;// update parents right
         }
         free(current);
     } else {
-        struct Node* temp = minValueNode(current->right);
-        current->key = temp->key;
-        current->right = delete(temp->key); // Recursively delete the inorder successor
+        struct Node* temp = minValueNode(current->right);// find inorder sucessor
+        current->key = temp->key;// replace it with sucessor
+        current->right = delete(current->right, temp->key); // Recursively delete the inorder successor
+    
     }
 
     return root;
@@ -293,7 +295,7 @@ int main() {
         } else if (strcmp(command, "DELETE") == 0) {// checks the commands for DELETE
             int temp = root->key;
             sscanf(line, "DELETE %d", &key);
-            root = delete(key);//deletes the wanted node
+            root = delete(root,key);//deletes the wanted node
             if (root != NULL && root->key != temp) {
                 printf("Root changed. The new root is %d\n", root->key);
             }
